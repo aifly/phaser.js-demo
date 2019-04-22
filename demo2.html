@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<meta name="viewport" content="width=750, user-scalable=no" />
+	<style>
+		*{margin: 0;padding:0;}
+		html,body{
+			height: 100%;
+		}
+		#canvas{
+			position: absolute;
+			left: 0;
+			top:0;
+			width: 100%;
+			height: 100%;;
+		}
+	</style>
+</head>
+<body>
+	<div id='canvas'></div>
+	<!--  -->
+	<script src='https://cdn.bootcss.com/phaser/2.6.2/phaser.js'></script>
+
+	<script>
+
+		function loadScript(src) {
+		var script = document.createElement('script');
+		script.src = src + "?t=" + new Date().getTime();
+		document.body.appendChild(script)
+		}
+		loadScript('./libs/inherits.js');
+		(function(){
+			class ZmitiStar{
+				constructor() {
+					
+				}
+				preload(){
+
+					game.load.image('platform','./assets/platform.png');
+					game.load.image('bg','./assets/sky.png');
+					game.load.image('star','./assets/star.png');
+					game.load.spritesheet('dude','./assets/dude.png',32,48);
+
+				}
+				create(){
+					//启动物理引擎
+					game.physics.startSystem(Phaser.Physics.ARCADE);
+					game.scale.scaleMode = Phaser.ScaleManager.ExACT_FIT;
+					this.bg = game.add.tileSprite(0,0,game.world.width*2,game.world.height,'bg');
+					this.platforms = game.add.group();
+					console.log(this.platforms)
+					//this.platforms.rotation = Phaser.Math.degToRad(Phaser.Math.wrapAngle(-40));;;
+					this.platforms.enableBody = true;
+					
+					this.ground = this.platforms.create(0,game.world.width - 50,'platform');
+
+					this.ground.body.checkCollision = {  any: false, up: true, down: true, left: true, right: false };
+					
+					
+					
+					this.ground.body.immovable = true;
+					this.ground.scale.setTo(4,4);
+					
+
+				 /*
+				 	var ledge = this.platforms.create(0,120,'platform');
+				 	ledge.body.immovable = true;
+
+				 	var ledge1 = this.platforms.create(game.world.width - 200,230,'platform');
+				 	ledge1.body.immovable = true;
+*/
+
+					
+					this.player = game.add.sprite(132,122,'dude');
+
+					game.physics.arcade.enable(this.player);
+
+					this.player.body.bounce.y = .2;
+					this.player.body.gravity.y = 100;
+					
+					
+					
+	
+					this.player.body.collideWorldBounds = true;
+
+					this.player.animations.add('left',[0,1,2,3],20,true);//20 为20ms
+					this.player.animations.add('right',[5,6,7,8],20,true);
+
+					this.cursors = game.input.keyboard.createCursorKeys();
+
+					this.stars = game.add.group();
+					this.stars.enableBody = true;
+
+
+					for(var i = 0 ;i<12;i++){
+						var star = this.stars.create(i * 70, 0, 'star');
+						star.body.gravity.y = 300;
+						star.body.bounce.y = .7 +  Math.random()*.2;
+					}
+
+					Phaser.World.prototype.displayObjectUpdateTransform = function() {
+						if(!game.scale.correct) {
+							
+							this.x = game.camera.y + game.width ;
+							this.y = -game.camera.x;
+							this.rotation = Phaser.Math.degToRad(Phaser.Math.wrapAngle(70));
+						} else {
+							this.x = -game.camera.x;
+							this.y = -game.camera.y;
+							this.rotation = 0;
+						}
+
+						PIXI.DisplayObject.prototype.updateTransform.call(this);
+					}
+
+
+					var WIDTH = window.innerHeight,
+						HEIGHT = window.innerWidth;
+
+			
+				
+					setTimeout(()=>{
+						if(game.scale.isLandscape) {
+							game.scale.correct = true;
+							game.scale.setGameSize(WIDTH, HEIGHT);
+								
+						} else {
+							game.scale.correct = false;
+							game.scale.setGameSize(HEIGHT, WIDTH);
+						}
+						game.scale.onOrientationChange.add(function() {
+							if(game.scale.isLandscape) {
+								game.scale.correct = true;
+								game.scale.setGameSize(WIDTH, HEIGHT);
+							} else {
+								game.scale.correct = false;
+								game.scale.setGameSize(HEIGHT, WIDTH);
+							}
+						}, this)
+					},100)
+				}
+				update(){
+					//console.log(1)
+
+					game.physics.arcade.collide(this.platforms,this.player,(player,ground)=>{
+						console.log(1)
+					});
+
+					game.physics.arcade.collide(this.platforms,this.stars);
+
+					game.physics.arcade.overlap(this.player,this.stars,function(player,star){
+
+						//star.kill();
+
+					},null,this);
+
+					this.player.body.velocity.x = 0;// game.rnd.integerInRange(-50, 50);;
+
+					if(this.cursors.left.isDown){
+						this.player.body.velocity.x = -150;
+						this.player.animations.play('left');
+					}
+					else if(this.cursors.right.isDown){
+						this.player.body.velocity.x = 150;
+						this.player.animations.play('right');
+					}else{
+				        this.player.animations.stop();
+				        this.player.frame = 4;//动画停止，，并且停留在第4帧
+				    }
+				    if (this.cursors.up.isDown && this.player.body.touching.down){
+				    	//this.player.body.touching.down player触碰到地上的时候才触发上跳的动作
+				        this.player.body.velocity.y = -350;
+				    }
+					
+
+
+				}
+
+				render(){
+					/*
+					*/
+					
+
+					 game.debug.spriteBounds(this.player,'#f00',false);
+					 //game.debug.body(this.player);
+					 //game.debug.spriteBounds(this.stars);
+					 game.debug.spriteBounds(this.ground);
+					
+				}
+			}
+
+			var game = new Phaser.Game(window.innerWidth,window.innerHeight,Phaser.CANVAS,'canvas',ZmitiStar);
+			window.game = game;
+			
+			//
+			
+			
+
+
+		})();
+	</script>
+</body>
+</html>
