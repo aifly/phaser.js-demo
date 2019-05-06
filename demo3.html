@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="viewport" content="width=750, user-scalable=no" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        #canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            ;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='canvas'></div>
+    <!--  -->
+    <script src='https://cdn.bootcss.com/phaser/2.6.2/phaser.js'></script>
+
+    <script>
+        function loadScript(src) {
+            var script = document.createElement('script');
+            script.src = src + "?t=" + new Date().getTime();
+            document.body.appendChild(script)
+        }
+        (function () {
+            class ZmitiStar {
+                constructor() {
+
+                }
+                preload() {
+
+                    
+                }
+                create() {
+
+                }
+                update() {
+                   
+
+                }
+
+                render() {
+                    /*
+                     */
+
+
+                    //game.debug.spriteBounds(this.player,'#f00',false);
+                    //game.debug.body(this.player);
+                    //game.debug.spriteBounds(this.stars);
+                    //game.debug.spriteBounds(this.ground);
+
+                }
+            }
+
+            var game = new Phaser.Game(750, 1206, Phaser.CANVAS, 'canvas', ZmitiStar);
+            window.game = game;
+
+            //
+
+
+
+
+        })();
+    </script>
+</body>
+
+</html>

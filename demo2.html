@@ -38,10 +38,10 @@
 				}
 				preload(){
 
-					game.load.image('platform','./assets/platform.png');
+					game.load.image('platform','./assets/platform1.png');
 					game.load.image('bg','./assets/sky.png');
 					game.load.image('star','./assets/star.png');
-					game.load.spritesheet('dude','./assets/dude.png',32,48);
+					game.load.spritesheet('dude','./assets/dude1.png',42,31.3);
 
 				}
 				create(){
@@ -54,9 +54,8 @@
 					//this.platforms.rotation = Phaser.Math.degToRad(Phaser.Math.wrapAngle(-40));;;
 					this.platforms.enableBody = true;
 					
-					this.ground = this.platforms.create(0,game.world.width - 50,'platform');
+					this.ground = this.platforms.create(0,0,'platform');
 
-					this.ground.body.checkCollision = {  any: false, up: true, down: true, left: true, right: false };
 					
 					
 					
@@ -64,24 +63,22 @@
 					this.ground.scale.setTo(4,4);
 					
 
-				 /*
-				 	var ledge = this.platforms.create(0,120,'platform');
+				 
+				 	var ledge = this.platforms.create(400,120,'platform');
 				 	ledge.body.immovable = true;
 
-				 	var ledge1 = this.platforms.create(game.world.width - 200,230,'platform');
+				 	var ledge1 = this.platforms.create(game.world.width - 200,600,'platform');
 				 	ledge1.body.immovable = true;
-*/
+
 
 					
-					this.player = game.add.sprite(132,122,'dude');
+					this.player = game.add.sprite(game.world.width - 30,122,'dude');
+					//this.player.rotation = Phaser.Math.degToRad(Phaser.Math.wrapAngle(90));;;
 
 					game.physics.arcade.enable(this.player);
 
-					this.player.body.bounce.y = .2;
-					this.player.body.gravity.y = 100;
-					
-					
-					
+					this.player.body.bounce.x = .2;
+					this.player.body.gravity.x = -100;
 	
 					this.player.body.collideWorldBounds = true;
 
@@ -95,83 +92,45 @@
 
 
 					for(var i = 0 ;i<12;i++){
-						var star = this.stars.create(i * 70, 0, 'star');
-						star.body.gravity.y = 300;
-						star.body.bounce.y = .7 +  Math.random()*.2;
+						var star = this.stars.create( game.world.width - 30,i * 70, 'star');
+						star.body.gravity.x = -300;
+						star.body.bounce.x = .7 +  Math.random()*.2;
 					}
 
-					Phaser.World.prototype.displayObjectUpdateTransform = function() {
-						if(!game.scale.correct) {
-							
-							this.x = game.camera.y + game.width ;
-							this.y = -game.camera.x;
-							this.rotation = Phaser.Math.degToRad(Phaser.Math.wrapAngle(70));
-						} else {
-							this.x = -game.camera.x;
-							this.y = -game.camera.y;
-							this.rotation = 0;
-						}
-
-						PIXI.DisplayObject.prototype.updateTransform.call(this);
-					}
-
-
-					var WIDTH = window.innerHeight,
-						HEIGHT = window.innerWidth;
-
-			
 				
-					setTimeout(()=>{
-						if(game.scale.isLandscape) {
-							game.scale.correct = true;
-							game.scale.setGameSize(WIDTH, HEIGHT);
-								
-						} else {
-							game.scale.correct = false;
-							game.scale.setGameSize(HEIGHT, WIDTH);
-						}
-						game.scale.onOrientationChange.add(function() {
-							if(game.scale.isLandscape) {
-								game.scale.correct = true;
-								game.scale.setGameSize(WIDTH, HEIGHT);
-							} else {
-								game.scale.correct = false;
-								game.scale.setGameSize(HEIGHT, WIDTH);
-							}
-						}, this)
-					},100)
 				}
 				update(){
 					//console.log(1)
 
 					game.physics.arcade.collide(this.platforms,this.player,(player,ground)=>{
-						console.log(1)
 					});
 
 					game.physics.arcade.collide(this.platforms,this.stars);
 
 					game.physics.arcade.overlap(this.player,this.stars,function(player,star){
 
-						//star.kill();
+						star.kill();
 
 					},null,this);
 
-					this.player.body.velocity.x = 0;// game.rnd.integerInRange(-50, 50);;
+					this.player.body.velocity.y = 0;// game.rnd.integerInRange(-50, 50);;
 
 					if(this.cursors.left.isDown){
-						this.player.body.velocity.x = -150;
+						this.player.body.velocity.y = -150;
 						this.player.animations.play('left');
 					}
 					else if(this.cursors.right.isDown){
-						this.player.body.velocity.x = 150;
+						this.player.body.velocity.y = 150;
 						this.player.animations.play('right');
 					}else{
 				        this.player.animations.stop();
 				        this.player.frame = 4;//动画停止，，并且停留在第4帧
-				    }
-				    if (this.cursors.up.isDown && this.player.body.touching.down){
+					}
+					
+				    if (this.cursors.up.isDown && this.player.body.touching.left){
 				    	//this.player.body.touching.down player触碰到地上的时候才触发上跳的动作
-				        this.player.body.velocity.y = -350;
+						this.player.body.velocity.x = 350;
+						console.log('jump....')
 				    }
 					
 
@@ -183,15 +142,15 @@
 					*/
 					
 
-					 game.debug.spriteBounds(this.player,'#f00',false);
+					 //game.debug.spriteBounds(this.player,'#f00',false);
 					 //game.debug.body(this.player);
 					 //game.debug.spriteBounds(this.stars);
-					 game.debug.spriteBounds(this.ground);
+					 //game.debug.spriteBounds(this.ground);
 					
 				}
 			}
 
-			var game = new Phaser.Game(window.innerWidth,window.innerHeight,Phaser.CANVAS,'canvas',ZmitiStar);
+			var game = new Phaser.Game(750,1206,Phaser.CANVAS,'canvas',ZmitiStar);
 			window.game = game;
 			
 			//

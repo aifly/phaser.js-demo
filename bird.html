@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=750, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<style lang="">
+		*{margin: 0;padding: 0;}
+		body{
+			font-size:0;
+		}
+	</style>
+</head>
+<body>
+	<div id="container"></div>
+	<script src='./libs/phaser.js'></script>
+	<script>
+		(function(document){
+
+
+			class Base{
+				constructor(){
+					this.game = Base.game;
+				}
+			}
+
+			class Boot extends Base{
+				constructor(){
+					super();
+				}
+				preload(){
+					
+					this.game.scale.forcePortrait = true;
+					this.game.scale.refresh();
+					var game = this.game;
+					game.load.image('loading', 'assets/preloader.gif');
+				}
+				create(){
+					this.game.state.start('preload')
+				}
+			}
+
+			class Preload extends Base {
+				constructor() {
+					super();
+				}
+				preload(){
+					var game = this.game;
+					var preloadSprite = game.add.sprite((game.width - 220)/2,game.height/2,'loading');
+					game.load.setPreloadSprite(preloadSprite);
+					game.load.image('background', 'assets/background.png');
+					game.load.image('ground', 'assets/ground.png');
+					game.load.image('title', 'assets/title.png');
+					game.load.spritesheet('bird', 'assets/bird.png', 34, 24, 3);
+					game.load.image('btn', 'assets/start-button.png');
+					game.load.spritesheet('pipe', 'assets/pipes.png', 54, 320, 2);
+					//game.load.bitmapFont('flappy_font', 'assets/fonts/flappyfont/flappyfont.png', 'assets/fonts/flappyfont/flappyfont.fnt');
+					//game.load.audio('fly_sound', 'assets/flap.wav');
+					//game.load.audio('score_sound', 'assets/score.wav');
+					//game.load.audio('hit_pipe_sound', 'assets/pipe-hit.wav');
+					//game.load.audio('hit_ground_sound', 'assets/ouch.wav');
+					game.load.image('ready_text', 'assets/get-ready.png');
+					game.load.image('play_tip', 'assets/instructions.png');
+					game.load.image('game_over', 'assets/gameover.png');
+					game.load.image('score_board', 'assets/scoreboard.png');
+				}
+				create(){
+					this.game.state.start('menu');
+				}
+			}
+
+			class Menu extends Base{
+				constructor(){
+					super()
+				}
+				preload(){
+
+				}
+				create(){
+
+					var game = this.game;
+
+					var bg = game.add.tileSprite(0, 0, game.width, game.height, 'background');
+					var ground = game.add.tileSprite(0,game.height - 112,game.width,112,'ground');
+					
+					//bg.autoSroll(-10,0);
+
+				}
+			}
+
+			var zmitiUtil = {
+				viewW:window.innerWidth,
+				viewH:window.innerHeight,
+				init(){
+					this.initGame();
+				},
+				initGame(){
+					let game = new Phaser.Game(288,505,Phaser.CANVAS,'container',Boot);
+					game.scaleMode = Phaser.ScaleManager.EXT;
+					Base.game = game;
+					game.state.add('boot',Boot);
+					game.state.add('preload',Preload);
+					game.state.add('menu',Menu);
+				},
+
+			};
+
+
+			zmitiUtil.init();
+		})(document);
+	</script>
+</body>
+</html>
